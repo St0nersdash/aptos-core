@@ -22,12 +22,16 @@ spec aptos_std::ed25519 {
         ensures result == Signature { bytes };
     }
 
+    spec public_key_bytes_to_authentication_key(pk_bytes: vector<u8>): vector<u8> {
+        pragma opaque;
+        aborts_if false;
+        ensures [abstract] result == spec_public_key_bytes_to_authentication_key(pk_bytes);
+    }
+
 
     // ----------------
     // Native functions
     // ----------------
-
-    spec fun spec_public_key_validate_internal(bytes: vector<u8>): bool;
 
     spec fun spec_signature_verify_strict_internal(
         signature: vector<u8>,
@@ -50,4 +54,23 @@ spec aptos_std::ed25519 {
         aborts_if false;
         ensures result == spec_signature_verify_strict_internal(signature, public_key, message);
     }
+
+
+    // ----------------
+    // Helper functions
+    // ----------------
+
+    spec fun spec_public_key_validate_internal(bytes: vector<u8>): bool;
+
+    spec fun spec_public_key_bytes_to_authentication_key(pk_bytes: vector<u8>): vector<u8>;
+
+    spec fun spec_signature_verify_strict_t<T>(signature: Signature, public_key: UnvalidatedPublicKey, data: T): bool {
+        let encoded = SignedMessage<T> {
+            type_info: type_info::type_of<T>(),
+            inner: data,
+        };
+        let message = bcs::serialize(encoded);
+        spec_signature_verify_strict_internal(signature.bytes, public_key.bytes, message)
+    }
+
 }

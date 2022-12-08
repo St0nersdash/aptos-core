@@ -214,13 +214,12 @@ spec aptos_framework::coin {
     /// An account can only be registered once.
     /// Updating `Account.guid_creation_num` will not overflow.
     spec register<CoinType>(account: &signer) {
-        // TODO: Add the abort condition about `type_info::type_of`
-        pragma aborts_if_is_partial;
         let account_addr = signer::address_of(account);
         let acc = global<account::Account>(account_addr);
         aborts_if acc.guid_creation_num + 2 > MAX_U64;
         aborts_if exists<CoinStore<CoinType>>(account_addr);
         aborts_if !exists<account::Account>(account_addr);
+        aborts_if !type_info::spec_is_struct<CoinType>();
         ensures exists<CoinStore<CoinType>>(account_addr);
     }
 
