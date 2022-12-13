@@ -1935,7 +1935,9 @@ name = "aptos-release-builder"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "aptos",
  "aptos-crypto",
+ "aptos-framework",
  "aptos-gas",
  "aptos-rest-client",
  "aptos-temppath",
@@ -1943,6 +1945,7 @@ dependencies = [
  "bcs 0.1.4 (git+https://github.com/aptos-labs/bcs.git?rev=d31fab9d81748e2594be5cd5cdf845786a30562d)",
  "clap 3.2.17",
  "futures",
+ "hex",
  "move-core-types",
  "move-model",
  "serde 1.0.149",
@@ -9182,6 +9185,7 @@ dependencies = [
  "futures",
  "hex",
  "move-core-types",
+ "move-model",
  "num_cpus",
  "once_cell",
  "proptest",

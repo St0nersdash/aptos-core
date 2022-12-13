@@ -37,7 +37,7 @@
 -  [Function `create_proposal`](#0x1_aptos_governance_create_proposal)
 -  [Function `create_proposal_v2`](#0x1_aptos_governance_create_proposal_v2)
 -  [Function `vote`](#0x1_aptos_governance_vote)
--  [Function `add_approved_script_hash_script`](#0x1_aptos_governance_add_approved_script_hash_script)
+-  [Function `c`](#0x1_aptos_governance_c)
 -  [Function `add_approved_script_hash`](#0x1_aptos_governance_add_approved_script_hash)
 -  [Function `resolve`](#0x1_aptos_governance_resolve)
 -  [Function `resolve_multi_step_proposal`](#0x1_aptos_governance_resolve_multi_step_proposal)
@@ -956,13 +956,13 @@ Vote on proposal with <code>proposal_id</code> and voting power from <code>stake
 
 </details>
 
-<a name="0x1_aptos_governance_add_approved_script_hash_script"></a>
+<a name="0x1_aptos_governance_c"></a>
 
-## Function `add_approved_script_hash_script`
+## Function `c`
 
 
 
-<pre><code><b>public</b> entry <b>fun</b> <a href="aptos_governance.md#0x1_aptos_governance_add_approved_script_hash_script">add_approved_script_hash_script</a>(proposal_id: u64)
+<pre><code><b>public</b> entry <b>fun</b> <a href="aptos_governance.md#0x1_aptos_governance_c">c</a>(proposal_id: u64)
 </code></pre>
 
 
@@ -971,7 +971,7 @@ Vote on proposal with <code>proposal_id</code> and voting power from <code>stake
 <summary>Implementation</summary>
 
 
-<pre><code><b>public</b> entry <b>fun</b> <a href="aptos_governance.md#0x1_aptos_governance_add_approved_script_hash_script">add_approved_script_hash_script</a>(proposal_id: u64) <b>acquires</b> <a href="aptos_governance.md#0x1_aptos_governance_ApprovedExecutionHashes">ApprovedExecutionHashes</a> {
+<pre><code><b>public</b> entry <b>fun</b> <a href="aptos_governance.md#0x1_aptos_governance_c">c</a>(proposal_id: u64) <b>acquires</b> <a href="aptos_governance.md#0x1_aptos_governance_ApprovedExecutionHashes">ApprovedExecutionHashes</a> {
     <a href="aptos_governance.md#0x1_aptos_governance_add_approved_script_hash">add_approved_script_hash</a>(proposal_id)
 }
 </code></pre>

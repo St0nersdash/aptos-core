@@ -3,10 +3,16 @@
 
 use super::Test;
 use crate::{CoreContext, Result, TestReport};
+use aptos::common::types::CliError;
+use aptos::governance::{Proposal, VotingForum};
 use aptos_cached_packages::aptos_stdlib;
-use aptos_logger::info;
-use aptos_rest_client::{Client as RestClient, PendingTransaction, State, Transaction};
+use aptos_logger::{info, Value};
+use aptos_rest_client::{Client as RestClient, PendingTransaction, Resource, State, Transaction};
+use aptos_sdk::crypto::HashValue;
+use aptos_sdk::types::account_config::CORE_CODE_ADDRESS;
+use aptos_sdk::types::on_chain_config::ApprovedExecutionHashes;
 use aptos_sdk::{
+    bcs,
     crypto::ed25519::Ed25519PublicKey,
     move_types::identifier::Identifier,
     transaction_builder::TransactionFactory,
@@ -22,6 +28,10 @@ use aptos_sdk::{
 };
 use rand::{rngs::OsRng, Rng, SeedableRng};
 use reqwest::Url;
+use serde::Deserialize;
+use serde::Serialize;
+use std::hash::Hash;
+use std::io::Cursor;
 
 #[async_trait::async_trait]
 pub trait AptosTest: Test {
@@ -199,6 +209,38 @@ impl<'t> AptosPublicInfo<'t> {
         TransactionFactory::new(self.chain_id).with_gas_unit_price(unit_price)
     }
 
+    pub async fn get_approved_execution_hash_at_aptos_governance(
+        &self,
+        proposal_id: u64,
+    ) -> Vec<u8> {
+        let approved_execution_hashes = self
+            .rest_client
+            .get_account_resource_bcs::<SimpleMap<u64, Vec<u8>>>(
+                CORE_CODE_ADDRESS,
+                "0x1::aptos_governance::ApprovedExecutionHashes",
+            )
+            .await;
+        let hashes = approved_execution_hashes.unwrap().into_inner().data;
+        let mut execution_hash = vec![];
+        for hash in hashes {
+            if hash.key == proposal_id {
+                execution_hash = hash.value;
+                break;
+            }
+        }
+        execution_hash
+    }
+
+    pub async fn add_approved_script_hash_script(&self, proposal_id: u64) -> Result<()> {
+        let tx =
+            self.root_account
+                .sign_with_transaction_builder(self.transaction_factory().payload(
+                    aptos_stdlib::aptos_governance_add_approved_script_hash_script(proposal_id),
+                ));
+        self.rest_client.submit_and_wait(&tx).await?;
+        Ok(())
+    }
+
     pub async fn get_balance(&self, address: AccountAddress) -> Option<u64> {
         let module = Identifier::new("coin".to_string()).unwrap();
         let name = Identifier::new("CoinStore".to_string()).unwrap();
@@ -305,4 +347,23 @@ pub async fn submit_and_wait_reconfig(client: &RestClient, txn: SignedTransactio
     assert_ne!(state.epoch, new_state.epoch);
 
     new_state
+}
+
+// struct SimpleMap<Key, Value> has copy, drop, store {
+// data: vector<Element<Key, Value>>,
+// }
+//
+// struct Element<Key, Value> has copy, drop, store {
+// key: Key,
+// value: Value,
+// }
+#[derive(Serialize, Deserialize)]
+struct SimpleMap<K, V> {
+    data: Vec<Element<K, V>>,
+}
+
+#[derive(Serialize, Deserialize)]
+struct Element<K, V> {
+    key: K,
+    value: V,
 }

@@ -103,7 +103,7 @@ pub enum EntryFunctionCall {
         amount: u64,
     },
 
-    AptosGovernanceAddApprovedScriptHashScript {
+    AptosGovernanceC {
         proposal_id: u64,
     },
 
@@ -512,9 +512,7 @@ impl EntryFunctionCall {
             AptosCoinClaimMintCapability {} => aptos_coin_claim_mint_capability(),
             AptosCoinDelegateMintCapability { to } => aptos_coin_delegate_mint_capability(to),
             AptosCoinMint { dst_addr, amount } => aptos_coin_mint(dst_addr, amount),
-            AptosGovernanceAddApprovedScriptHashScript { proposal_id } => {
-                aptos_governance_add_approved_script_hash_script(proposal_id)
-            }
+            AptosGovernanceC { proposal_id } => aptos_governance_c(proposal_id),
             AptosGovernanceCreateProposal {
                 stake_pool,
                 execution_hash,
@@ -943,7 +941,7 @@ pub fn aptos_coin_mint(dst_addr: AccountAddress, amount: u64) -> TransactionPayl
     ))
 }
 
-pub fn aptos_governance_add_approved_script_hash_script(proposal_id: u64) -> TransactionPayload {
+pub fn aptos_governance_c(proposal_id: u64) -> TransactionPayload {
     TransactionPayload::EntryFunction(EntryFunction::new(
         ModuleId::new(
             AccountAddress::new([
@@ -952,7 +950,7 @@ pub fn aptos_governance_add_approved_script_hash_script(proposal_id: u64) -> Tra
             ]),
             ident_str!("aptos_governance").to_owned(),
         ),
-        ident_str!("add_approved_script_hash_script").to_owned(),
+        ident_str!("c").to_owned(),
         vec![],
         vec![bcs::to_bytes(&proposal_id).unwrap()],
     ))
@@ -2245,15 +2243,11 @@ mod decoder {
         }
     }
 
-    pub fn aptos_governance_add_approved_script_hash_script(
-        payload: &TransactionPayload,
-    ) -> Option<EntryFunctionCall> {
+    pub fn aptos_governance_c(payload: &TransactionPayload) -> Option<EntryFunctionCall> {
         if let TransactionPayload::EntryFunction(script) = payload {
-            Some(
-                EntryFunctionCall::AptosGovernanceAddApprovedScriptHashScript {
-                    proposal_id: bcs::from_bytes(script.args().get(0)?).ok()?,
-                },
-            )
+            Some(EntryFunctionCall::AptosGovernanceC {
+                proposal_id: bcs::from_bytes(script.args().get(0)?).ok()?,
+            })
         } else {
             None
         }
@@ -2996,8 +2990,8 @@ static SCRIPT_FUNCTION_DECODER_MAP: once_cell::sync::Lazy<EntryFunctionDecoderMa
             Box::new(decoder::aptos_coin_mint),
         );
         map.insert(
-            "aptos_governance_add_approved_script_hash_script".to_string(),
-            Box::new(decoder::aptos_governance_add_approved_script_hash_script),
+            "aptos_governance_c".to_string(),
+            Box::new(decoder::aptos_governance_c),
         );
         map.insert(
             "aptos_governance_create_proposal".to_string(),
