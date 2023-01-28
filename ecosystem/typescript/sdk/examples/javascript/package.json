@@ -11,6 +11,6 @@
   "license": "ISC",
   "dependencies": {
     "aptos": "latest",
-    "dotenv": "16.0.2"
+    "dotenv": "16.0.3"
   }
 }
