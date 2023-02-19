@@ -33,7 +33,7 @@
     "@types/react": "^18.0.25",
     "buffer": "^6.0.3",
     "clsx": "1.2.1",
-    "hast-util-is-element": "1.1.0",
+    "hast-util-is-element": "2.1.3",
     "mkdirp": "^1.0.4",
     "path-to-regex": "^1.3.8",
     "prism-react-renderer": "1.3.5",
